@@ -10,7 +10,7 @@ const updates = [
         name: "FINDING “LUDORI” - ĐẰNG SAU CÁI TÊN CÓ GÌ NHỈ? 🧸",
         url: "https://www.facebook.com/share/p/17i5kjUsug/",
         image: "image/568462961_1237573765072562_2770968611549770105_n.jpg",
-        description: "Faculty of Public Relations and Communication, Van Lang University từ Facebook.."
+        description: "Faculty of Public Relations and Communication, Van Lang University từ Facebook."
     }
 ];
 
