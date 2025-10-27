@@ -17,6 +17,12 @@ const updates = [
 // Dữ liệu sự kiện (dễ dàng tùy chỉnh)
 const classs = [
     {
+        name: "Nộp bài tập Elearning Pháp Luật Đại Cương",
+        url: "https://elearning.vlu.edu.vn/mod/quiz/view.php?id=430346",
+        image: "image/123974617e492.png",
+        description: "Thời gian nộp bài tập từ 27/10/2025 đến hết ngày 07/11/2025."
+    },
+    {
         name: "Danh sách nhóm nhiếp ảnh kỹ thuật số",
         url: "https://docs.google.com/spreadsheets/d/1txIPxrHitz56LjDTsm_9PtL5IwlJS0XsefwSKnw4Fhg/edit?gid=0#gid=0",
         image: "image/13581324978751764387.png",
