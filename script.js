@@ -17,6 +17,12 @@ const updates = [
 // Dữ liệu sự kiện (dễ dàng tùy chỉnh)
 const classs = [
     {
+        name: "Thu tiền hội sinh viên K31",
+        url: "https://drive.google.com/file/d/1m68oazKM7pGeurIVpA6QrqyfhU3mNoWm/view?usp=sharing",
+        image: "image/12335151.png",
+        description: "Nộp trước 20:00PM ngày 30/10/2025."
+    },
+    {
         name: "Nộp bài tập Elearning Pháp Luật Đại Cương",
         url: "https://elearning.vlu.edu.vn/mod/quiz/view.php?id=430346",
         image: "image/123974617e492.png",
