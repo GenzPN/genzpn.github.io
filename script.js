@@ -84,6 +84,8 @@ function renderItems(containerId, items) {
         box.innerHTML = `
             <img src="${item.image}" alt="${item.name}">
             <h3>${item.name}</h3>
+            <p>${descHtml}</p>
+            <div class="links">${linksHtml}</div>
         `;
         container.appendChild(box);
     });
