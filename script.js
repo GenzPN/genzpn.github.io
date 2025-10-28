@@ -20,7 +20,7 @@ const classs = [
         name: "Thu tiền hội sinh viên K31",
         links: [
             { label: "Tài Liệu", url: "https://drive.google.com/file/d/1m68oazKM7pGeurIVpA6QrqyfhU3mNoWm/view?usp=sharing" },
-            { label: "Google Form", url: "https://example.com/original-image" }
+            { label: "Google Form", url: "https://docs.google.com/forms/d/e/1FAIpQLSfCfb_v3rqN8MgfzgZI58PvFDa79aA5m4SeLTCPAOF0bkBH7A/viewform" }
         ],
         image: "image/12335151.png",
         description: "Thông báo về việc thu Hội phí Khóa 31 năm học 2025 - 2026 tại Trường Đại học Văn Lang. Nộp trước <strong>20:00 ngày 30/10/2025</strong>."
