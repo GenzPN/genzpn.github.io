@@ -1,5 +1,5 @@
 // CẤU HÌNH
-const folderPath = './image/'; 
+const folderPath = './image/'; // Nhớ có dấu chấm
 const gallery = document.getElementById('gallery');
 const loader = document.getElementById('loader');
 
@@ -13,56 +13,50 @@ const closeBtn = document.getElementsByClassName('close-btn')[0];
 function loadImagesAuto() {
     let index = 1;
 
-    // Hàm thử tìm ảnh với nhiều cái tên khác nhau
-    function tryLoadNextImage() {
-        // Danh sách các tên file có thể xảy ra
-        const possibleNames = [
-            `${index}.jpg`,      // 1.jpg
-            `${index}.JPG`,      // 1.JPG (In hoa)
-            `${index}.jpeg`,     // 1.jpeg
-            `${index}.png`,      // 1.png
-            `(${index}).jpg`,    // (1).jpg
-            `(${index}).JPG`,    // (1).JPG
-            ` (${index}).jpg`,   //  (1).jpg (Có dấu cách đầu)
-            ` (${index}).JPG`    //  (1).JPG (Có dấu cách đầu)
-        ];
-
-        // Hàm đệ quy để thử từng tên trong danh sách trên
-        function attemptLoad(candidateList, nameIndex) {
-            if (nameIndex >= candidateList.length) {
-                // Đã thử hết các tên mà vẫn không thấy -> Dừng lại
-                console.log(`Dừng tại số ${index}. Không tìm thấy ảnh nào khớp.`);
-                loader.innerHTML = "<p>Đã tải xong toàn bộ ảnh.</p>";
+    // Hàm đệ quy tìm ảnh
+    function findAndLoadImage() {
+        // Danh sách các đuôi file có thể xảy ra
+        // GitHub phân biệt hoa thường nên ta phải thử hết
+        const extensions = ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG'];
+        
+        // Hàm thử từng đuôi một
+        function tryExtension(extIndex) {
+            if (extIndex >= extensions.length) {
+                // Đã thử hết đuôi mà không thấy -> Dừng
+                console.log(`Dừng tại ảnh số ${index}. Không tìm thấy file hợp lệ.`);
+                loader.innerHTML = "<p>Đã tải hết ảnh.</p>";
                 setTimeout(() => loader.style.display = 'none', 3000);
                 return;
             }
 
-            const fileName = candidateList[nameIndex];
+            const currentExt = extensions[extIndex];
+            const fileName = `${index}${currentExt}`; // Ví dụ: 1.jpg
             const img = new Image();
+            
             img.src = folderPath + fileName;
 
             img.onload = function() {
-                // Tìm thấy rồi!
+                // Tìm thấy!
                 console.log(`Đã tìm thấy: ${fileName}`);
                 createGalleryItem(img.src, fileName);
-                index++; 
-                tryLoadNextImage(); // Tìm số tiếp theo
+                index++; // Tăng số thứ tự
+                findAndLoadImage(); // Tìm tiếp ảnh sau
             };
 
             img.onerror = function() {
-                // Không thấy tên này, thử tên tiếp theo trong danh sách
-                attemptLoad(candidateList, nameIndex + 1);
+                // Không thấy đuôi này, thử đuôi tiếp theo trong danh sách
+                tryExtension(extIndex + 1);
             };
         }
 
-        // Bắt đầu thử danh sách tên cho số thứ tự hiện tại
-        attemptLoad(possibleNames, 0);
+        // Bắt đầu thử từ đuôi đầu tiên
+        tryExtension(0);
     }
 
-    tryLoadNextImage();
+    findAndLoadImage();
 }
 
-// --- CÁC HÀM XỬ LÝ GIAO DIỆN (GIỮ NGUYÊN) ---
+// --- CÁC HÀM GIAO DIỆN (GIỮ NGUYÊN) ---
 function createGalleryItem(src, fileName) {
     const item = document.createElement('div');
     item.className = 'gallery-item';
@@ -81,23 +75,27 @@ function openLightbox(imgElement, src) {
     downloadBtn.href = src;
     exifInfoBox.innerHTML = "Đang đọc thông số...";
 
-    // Đọc EXIF
-    EXIF.getData(imgElement, function() {
-        const make = EXIF.getTag(this, "Make") || "";
-        const model = EXIF.getTag(this, "Model") || "";
-        const iso = EXIF.getTag(this, "ISOSpeedRatings");
-        const fNumber = EXIF.getTag(this, "FNumber");
-        const exposure = EXIF.getTag(this, "ExposureTime");
+    // Đọc EXIF (Cần thư viện exif-js trong file html)
+    if (typeof EXIF !== 'undefined') {
+        EXIF.getData(imgElement, function() {
+            const make = EXIF.getTag(this, "Make") || "";
+            const model = EXIF.getTag(this, "Model") || "";
+            const iso = EXIF.getTag(this, "ISOSpeedRatings");
+            const fNumber = EXIF.getTag(this, "FNumber");
+            const exposure = EXIF.getTag(this, "ExposureTime");
 
-        let info = "";
-        if(make || model) info += `<div>📷 ${make} ${model}</div>`;
-        if(fNumber) info += `<div>⭕ f/${fNumber}</div>`;
-        if(exposure) info += `<div>⏱ ${exposure.numerator}/${exposure.denominator}s</div>`;
-        if(iso) info += `<div>💡 ISO ${iso}</div>`;
-        
-        if(info === "") info = "<div>Không có thông số (Metadata trống)</div>";
-        exifInfoBox.innerHTML = info;
-    });
+            let info = "";
+            if(make || model) info += `<div>📷 ${make} ${model}</div>`;
+            if(fNumber) info += `<div>⭕ f/${fNumber}</div>`;
+            if(exposure) info += `<div>⏱ ${exposure.numerator}/${exposure.denominator}s</div>`;
+            if(iso) info += `<div>💡 ISO ${iso}</div>`;
+            
+            if(info === "") info = "<div>Không có thông số EXIF</div>";
+            exifInfoBox.innerHTML = info;
+        });
+    } else {
+        exifInfoBox.innerHTML = "Lỗi: Chưa cài thư viện EXIF";
+    }
 }
 
 function closeLightbox() {
