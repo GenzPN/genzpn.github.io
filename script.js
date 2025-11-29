@@ -56,7 +56,7 @@ function renderItems(containerId, items) {
         box.className = 'bento-box';
         box.innerHTML = `
             <img src="${item.image}" alt="${item.name}">
-            <h3>${item.name}</h3>
+            <h3 style="color: red">${item.name}</h3>
             <p>${item.description}</p>
             <a href="${item.url}">Link</a>
         `;
