@@ -18,15 +18,18 @@ const updates = [
 const classs = [
     {
         name: "Thu tiền hội sinh viên K31",
-        url: "https://drive.google.com/file/d/1m68oazKM7pGeurIVpA6QrqyfhU3mNoWm/view?usp=sharing",
+        links: [
+            { label: "Tài Liệu", url: "https://drive.google.com/file/d/1m68oazKM7pGeurIVpA6QrqyfhU3mNoWm/view?usp=sharing" },
+            { label: "Google Form", url: "https://docs.google.com/forms/d/e/1FAIpQLSfCfb_v3rqN8MgfzgZI58PvFDa79aA5m4SeLTCPAOF0bkBH7A/viewform" }
+        ],
         image: "image/12335151.png",
-        description: "Nộp trước 20:00PM ngày 30/10/2025."
+        description: "Thông báo về việc thu Hội phí Khóa 31 năm học 2025 - 2026 tại Trường Đại học Văn Lang. Nộp trước <strong>20:00 ngày 30/10/2025</strong>."
     },
     {
         name: "Nộp bài tập Elearning Pháp Luật Đại Cương",
         url: "https://elearning.vlu.edu.vn/mod/quiz/view.php?id=430346",
         image: "image/123974617e492.png",
-        description: "Thời gian nộp bài tập từ 27/10/2025 đến hết ngày 07/11/2025."
+        description: "Thời gian nộp bài tập <strong>từ 27/10/2025 đến hết ngày 07/11/2025</strong>."
     },
     {
         name: "Danh sách nhóm nhiếp ảnh kỹ thuật số",
@@ -54,11 +57,35 @@ function renderItems(containerId, items) {
     items.forEach(item => {
         const box = document.createElement('div');
         box.className = 'bento-box';
+
+        // Chuẩn bị danh sách link (ưu tiên item.url, hoặc dùng item.links array) — tối đa 3
+        const linksArr = [];
+        if (item.url) {
+            linksArr.push({ label: 'Link', url: item.url });
+        }
+        if (Array.isArray(item.links)) {
+            item.links.slice(0, 3).forEach(l => {
+                // nếu đã có url trùng lặp, vẫn thêm; bạn có thể điều chỉnh logic nếu cần
+                linksArr.push({ label: l.label || 'Link', url: l.url });
+            });
+        }
+
+        // format **bold** -> <strong>bold</strong>
+        function formatDescription(desc) {
+            return String(desc).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        const linksHtml = linksArr.map((l, i) =>
+            `<a href="${l.url}" target="_blank" rel="noopener noreferrer">${linksArr.length>1 ? (i+1)+'. ' : ''}${l.label}</a>`
+        ).join(' ');
+
+        const descHtml = formatDescription(item.description);
+
         box.innerHTML = `
             <img src="${item.image}" alt="${item.name}">
-            <h3 style="color: red">${item.name}</h3>
-            <p>${item.description}</p>
-            <a href="${item.url}">Link</a>
+            <h3>${item.name}</h3>
+            <p>${descHtml}</p>
+            <div class="links">${linksHtml}</div>
         `;
         container.appendChild(box);
     });
