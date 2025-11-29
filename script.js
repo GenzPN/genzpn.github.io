@@ -1,96 +1,111 @@
-// Dữ liệu thông báo (dễ dàng tùy chỉnh)
-const updates = [
-    {
-        name: "Album ảnh “Lăng Kính Xanh” đã lên sóng rồi đây.",
-        url: "https://www.facebook.com/share/p/1Cd3z7WsNG/",
-        image: "image/569011842_1239416761554929_4286877904701532842_n.jpg",
-        description: "Faculty of Public Relations and Communication, Van Lang University từ Facebook."
-    },
-    {
-        name: "FINDING “LUDORI” - ĐẰNG SAU CÁI TÊN CÓ GÌ NHỈ? 🧸",
-        url: "https://www.facebook.com/share/p/17i5kjUsug/",
-        image: "image/568462961_1237573765072562_2770968611549770105_n.jpg",
-        description: "Faculty of Public Relations and Communication, Van Lang University từ Facebook."
+// CẤU HÌNH
+const folderPath = './image/'; 
+const gallery = document.getElementById('gallery');
+const loader = document.getElementById('loader');
+
+// Các biến Lightbox
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const exifInfoBox = document.getElementById('exif-info');
+const downloadBtn = document.getElementById('download-btn');
+const closeBtn = document.getElementsByClassName('close-btn')[0];
+
+function loadImagesAuto() {
+    let index = 1;
+
+    // Hàm thử tìm ảnh với nhiều cái tên khác nhau
+    function tryLoadNextImage() {
+        // Danh sách các tên file có thể xảy ra
+        const possibleNames = [
+            `${index}.jpg`,      // 1.jpg
+            `${index}.JPG`,      // 1.JPG (In hoa)
+            `${index}.jpeg`,     // 1.jpeg
+            `${index}.png`,      // 1.png
+            `(${index}).jpg`,    // (1).jpg
+            `(${index}).JPG`,    // (1).JPG
+            ` (${index}).jpg`,   //  (1).jpg (Có dấu cách đầu)
+            ` (${index}).JPG`    //  (1).JPG (Có dấu cách đầu)
+        ];
+
+        // Hàm đệ quy để thử từng tên trong danh sách trên
+        function attemptLoad(candidateList, nameIndex) {
+            if (nameIndex >= candidateList.length) {
+                // Đã thử hết các tên mà vẫn không thấy -> Dừng lại
+                console.log(`Dừng tại số ${index}. Không tìm thấy ảnh nào khớp.`);
+                loader.innerHTML = "<p>Đã tải xong toàn bộ ảnh.</p>";
+                setTimeout(() => loader.style.display = 'none', 3000);
+                return;
+            }
+
+            const fileName = candidateList[nameIndex];
+            const img = new Image();
+            img.src = folderPath + fileName;
+
+            img.onload = function() {
+                // Tìm thấy rồi!
+                console.log(`Đã tìm thấy: ${fileName}`);
+                createGalleryItem(img.src, fileName);
+                index++; 
+                tryLoadNextImage(); // Tìm số tiếp theo
+            };
+
+            img.onerror = function() {
+                // Không thấy tên này, thử tên tiếp theo trong danh sách
+                attemptLoad(candidateList, nameIndex + 1);
+            };
+        }
+
+        // Bắt đầu thử danh sách tên cho số thứ tự hiện tại
+        attemptLoad(possibleNames, 0);
     }
-];
 
-// Dữ liệu sự kiện (dễ dàng tùy chỉnh)
-const classs = [
-    {
-        name: "Thu tiền hội sinh viên K31",
-        links: [
-            { label: "Tài Liệu", url: "https://drive.google.com/file/d/1m68oazKM7pGeurIVpA6QrqyfhU3mNoWm/view?usp=sharing" },
-            { label: "Google Form", url: "https://docs.google.com/forms/d/e/1FAIpQLSfCfb_v3rqN8MgfzgZI58PvFDa79aA5m4SeLTCPAOF0bkBH7A/viewform" }
-        ],
-        image: "image/12335151.png",
-        description: "Thông báo về việc thu Hội phí Khóa 31 năm học 2025 - 2026 tại Trường Đại học Văn Lang. Nộp trước <strong>20:00 ngày 30/10/2025</strong>."
-    },
-    {
-        name: "Nộp bài tập Elearning Pháp Luật Đại Cương",
-        url: "https://elearning.vlu.edu.vn/mod/quiz/view.php?id=430346",
-        image: "image/123974617e492.png",
-        description: "Thời gian nộp bài tập <strong>từ 27/10/2025 đến hết ngày 07/11/2025</strong>."
-    },
-    {
-        name: "Danh sách nhóm nhiếp ảnh kỹ thuật số",
-        url: "https://docs.google.com/spreadsheets/d/1txIPxrHitz56LjDTsm_9PtL5IwlJS0XsefwSKnw4Fhg/edit?gid=0#gid=0",
-        image: "image/13581324978751764387.png",
-        description: "Google Sheet cho nhóm nhiếp ảnh."
-    },
-    {
-        name: "Danh sách nhóm nhập môn truyền thông đa phương tiện",
-        url: "https://docs.google.com/spreadsheets/d/11Xm2FoLGxYuCrnYp7L4wSvBQHolIsBmSI5xRKmqYdyQ/edit?gid=0#gid=0",
-        image: "image/13581324978751764387.png",
-        description: "Google Sheet cho nhóm nhập môn truyền thông đa phương tiện."
-    },
-    {
-        name: "Nộp bài tập nhập môn truyền thông đa phương tiện",
-        url: "https://drive.google.com/drive/folders/1lWJcEEtZAGvSK2-yJpriNfch4yiec2J-",
-        image: "image/178382346834.png",
-        description: "Nộp bài tập qua Google Drive"
-    }
-];
+    tryLoadNextImage();
+}
 
-// Hàm render nội dung
-function renderItems(containerId, items) {
-    const container = document.getElementById(containerId);
-    items.forEach(item => {
-        const box = document.createElement('div');
-        box.className = 'bento-box';
+// --- CÁC HÀM XỬ LÝ GIAO DIỆN (GIỮ NGUYÊN) ---
+function createGalleryItem(src, fileName) {
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    const imageTag = document.createElement('img');
+    imageTag.src = src;
+    imageTag.alt = fileName;
+    item.onclick = () => openLightbox(imageTag, src);
+    item.appendChild(imageTag);
+    gallery.insertBefore(item, loader);
+}
 
-        // Chuẩn bị danh sách link (ưu tiên item.url, hoặc dùng item.links array) — tối đa 3
-        const linksArr = [];
-        if (item.url) {
-            linksArr.push({ label: 'Link', url: item.url });
-        }
-        if (Array.isArray(item.links)) {
-            item.links.slice(0, 3).forEach(l => {
-                // nếu đã có url trùng lặp, vẫn thêm; bạn có thể điều chỉnh logic nếu cần
-                linksArr.push({ label: l.label || 'Link', url: l.url });
-            });
-        }
+function openLightbox(imgElement, src) {
+    lightbox.style.display = "flex";
+    lightboxImg.src = src;
+    document.body.style.overflow = "hidden";
+    downloadBtn.href = src;
+    exifInfoBox.innerHTML = "Đang đọc thông số...";
 
-        // format **bold** -> <strong>bold</strong>
-        function formatDescription(desc) {
-            return String(desc).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        }
+    // Đọc EXIF
+    EXIF.getData(imgElement, function() {
+        const make = EXIF.getTag(this, "Make") || "";
+        const model = EXIF.getTag(this, "Model") || "";
+        const iso = EXIF.getTag(this, "ISOSpeedRatings");
+        const fNumber = EXIF.getTag(this, "FNumber");
+        const exposure = EXIF.getTag(this, "ExposureTime");
 
-        const linksHtml = linksArr.map((l, i) =>
-            `<a href="${l.url}" target="_blank" rel="noopener noreferrer">${linksArr.length>1 ? (i+1)+'. ' : ''}${l.label}</a>`
-        ).join(' ');
-
-        const descHtml = formatDescription(item.description);
-
-        box.innerHTML = `
-            <img src="${item.image}" alt="${item.name}">
-            <h3>${item.name}</h3>
-            <p>${descHtml}</p>
-            <div class="links">${linksHtml}</div>
-        `;
-        container.appendChild(box);
+        let info = "";
+        if(make || model) info += `<div>📷 ${make} ${model}</div>`;
+        if(fNumber) info += `<div>⭕ f/${fNumber}</div>`;
+        if(exposure) info += `<div>⏱ ${exposure.numerator}/${exposure.denominator}s</div>`;
+        if(iso) info += `<div>💡 ISO ${iso}</div>`;
+        
+        if(info === "") info = "<div>Không có thông số (Metadata trống)</div>";
+        exifInfoBox.innerHTML = info;
     });
 }
 
-// Render thông báo và sự kiện
-renderItems('updates', updates);
-renderItems('classs', classs);
+function closeLightbox() {
+    lightbox.style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+closeBtn.onclick = closeLightbox;
+lightbox.onclick = (e) => { if (e.target === lightbox || e.target.classList.contains('lightbox-wrapper')) closeLightbox(); };
+
+window.onload = loadImagesAuto;
